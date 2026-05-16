@@ -15,7 +15,7 @@ services:
     image: nginx:alpine
     container_name: laravel_nginx
     ports:
-      - "8080:80"
+      - "${APP_PORT}:80"
     volumes:
       - ./app/:/var/www/html
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -27,9 +27,9 @@ services:
     container_name: laravel_db
     restart: always
     environment:
-      MYSQL_DATABASE: laravel
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: laravel
-      MYSQL_PASSWORD: secret
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "3306:3306"
+      - "${DB_PORT}:3306"
