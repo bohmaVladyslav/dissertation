@@ -33,3 +33,17 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "${DB_PORT}:3306"
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+  
+  vite:
+    image: node:20
+    container_name: laravel_vite
+    working_dir: /var/www/html
+    volumes:
+      - ./app/:/var/www/html
+    ports:
+      - "${VITE_PORT}:5173"
+    depends_on:
+      - app
+    command: sh -c "npm install && npm run dev -- --host"

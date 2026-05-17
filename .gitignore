@@ -1,2 +1,3 @@
 tasks.md
 .env
+docker/mysql/data
