@@ -5,7 +5,7 @@
         <div class="d-flex align-items-center gap-4 flex-grow-1">
 
             {{-- Лого --}}
-            <a class="navbar-brand d-flex align-items-center gap-2 m-0" href="#">
+            <a class="navbar-brand d-flex align-items-center gap-2 m-0" href="{{ route('index') }}">
                 <img src="{{ asset('images/book.svg') }}"
                     alt="Logo"
                     width="40"
@@ -56,6 +56,12 @@
                 <li>
                     <a class="dropdown-item" href="{{ route('collections.create') }}">
                         Добавить коллекцию
+                    </a>
+                </li>
+
+                <li>
+                    <a class="dropdown-item" href="{{ route('books.archive.create') }}">
+                        Загрузить архив
                     </a>
                 </li>
 

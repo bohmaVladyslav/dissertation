@@ -12,6 +12,10 @@
                 Редактировать
             </a>
 
+            <a href="{{ route('collections.download', $collection->id) }}" download class="btn btn-primary">
+                Скачать
+            </a>
+
             <form action="{{ route('collections.destroy', $collection->id) }}" method="POST" class="d-inline">
                 @csrf
                 @method('DELETE')
@@ -20,13 +24,22 @@
                     Удалить
                 </button>
             </form>
+
+            <form action="{{ route('collections.destroyAll', $collection->id) }}" method="POST" class="d-inline">
+                @csrf
+                @method('DELETE')
+
+                <button class="btn btn-danger" onclick="return confirm('Удалить коллекцию с книгами?')">
+                    Удалить вместе с книгами
+                </button>
+            </form>
         </div>
     </div>
 
     {{-- Книги --}}
     <div class="card">
         <div class="card-header">
-            Книги в коллекции
+            {{ $collection->name }}
         </div>
 
         <div class="card-body">
@@ -40,9 +53,30 @@
                                 <small class="text-muted">{{ $book->author }}</small>
                             </div>
 
-                            <a href="{{ route('books.show', $book->id) }}" class="btn btn-sm btn-outline-primary">
-                                Открыть
-                            </a>
+                            <div class="d-flex gap-2">
+                                <a href="{{ route('books.show', $book->id) }}" class="btn btn-sm btn-outline-primary">
+                                    Открыть
+                                </a>
+    
+                                <form action="{{ route('collection.deleteBook', [$collection->id, $book->id]) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+    
+                                    <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить коллекцию?')">
+                                        Удалить из коллекции
+                                    </button>
+                                </form>
+                                
+                                <form action="{{ route('books.destroy', [$book->id]) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+    
+                                    <button class="btn btn-sm btn-danger" onclick="return confirm('Удалить книгу?')">
+                                        Удалить книгу
+                                    </button>
+                                </form>
+                            </div>
+
 
                         </li>
                     @endforeach

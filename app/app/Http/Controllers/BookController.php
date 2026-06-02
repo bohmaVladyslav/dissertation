@@ -191,9 +191,13 @@ class BookController extends Controller
 
         $book->delete();
 
-        return response()->json([
-            'message' => 'Book deleted successfully'
-        ]);
+        $previous = url()->previous();
+
+        if (str_contains($previous, '/books/')) {
+            return redirect('/user');
+        }
+
+        return redirect()->back();
     }
 
     public function read(Request $request, Book $book)

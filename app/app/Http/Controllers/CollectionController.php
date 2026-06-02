@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Collection;
 use Illuminate\Http\Request;
 use App\Models\Book;
-
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 
 class CollectionController extends Controller
@@ -63,17 +63,18 @@ class CollectionController extends Controller
     {
         return view('collections.show', [
             'collection' => $collection,
-        ]); 
+        ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Collection $collection) {
+    public function edit(Collection $collection)
+    {
         return view('collections.edit', [
             'collection' => $collection,
             'books' => Book::all()
-        ]); 
+        ]);
     }
 
     /**
@@ -90,6 +91,99 @@ class CollectionController extends Controller
         return redirect('/collections/' . $collection->id);
     }
 
+    public function deleteBook(Request $request, Collection $collection, Book $book)
+    {
+        $collection->books()->detach($book);
+
+        return redirect('/collections/' . $collection->id);
+    }
+
+
+    public function destroyAll(Collection $collection)
+    {
+        $books = $collection->books()->get();
+
+        $collection->books()->detach();
+
+        foreach ($books as $book) {
+            $book->delete();
+        }
+
+        $collection->delete();
+
+        return redirect('/user');
+    }
+
+    public function download(Collection $collection)
+    {
+        $books = $collection->books;
+
+        if ($books->isEmpty()) {
+            return back()->withErrors(['collection' => 'Коллекция пуста']);
+        }
+
+        // 1. временная папка
+        $tempDir = storage_path('app/tmp/' . Str::uuid());
+
+        if (!is_dir($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+
+        // 2. копируем файлы книг во временную папку
+        foreach ($books as $book) {
+            $sourcePath = storage_path('app/public/' . $book->file_path);
+
+            if (!file_exists($sourcePath)) {
+                continue;
+            }
+
+            $extension = pathinfo($book->file_path, PATHINFO_EXTENSION);
+
+            // чистим название файла
+            $safeTitle = preg_replace('/[^\p{L}\p{N}\s\-]/u', '', $book->title);
+            $safeTitle = trim($safeTitle);
+            $safeTitle = str_replace(' ', '_', $safeTitle);
+
+            if (!$safeTitle) {
+                $safeTitle = 'book_' . $book->id;
+            }
+
+            $fileName = $safeTitle . '.' . $extension;
+
+            copy($sourcePath, $tempDir . '/' . $fileName);
+        }
+
+        // 3. создаём zip архив
+        $zipName = $collection->name . '.zip';
+        $zipPath = storage_path('app/tmp/' . $zipName);
+
+        $zip = new \ZipArchive();
+
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            return back()->withErrors(['collection' => 'Не удалось создать архив']);
+        }
+
+        $files = scandir($tempDir);
+
+        foreach ($files as $file) {
+            if ($file === '.' || $file === '..') continue;
+
+            $zip->addFile($tempDir . '/' . $file, $file);
+        }
+
+        $zip->close();
+
+        // 4. удаляем временную папку
+        foreach (glob($tempDir . '/*') as $file) {
+            unlink($file);
+        }
+        rmdir($tempDir);
+
+        // 5. отдаём файл пользователю
+        return response()->download($zipPath)->deleteFileAfterSend(true);
+    }
+
+
     /**
      * Remove the specified resource from storage.
      */
@@ -97,6 +191,6 @@ class CollectionController extends Controller
     {
         $collection->delete();
 
-        return redirect('/collections');
+        return redirect('/user');
     }
 }
