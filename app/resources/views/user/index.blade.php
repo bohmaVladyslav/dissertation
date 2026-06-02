@@ -2,18 +2,18 @@
 @section('content')
     <div class="row mb-5">
         <div class="d-flex col col-auto">
-            <img src="{{ asset('images/user.png') }}" class="img-fluid rounded-circle">
+            <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('images/user.png') }}" width="120" height="120" class="img-fluid rounded-circle">
         </div>
         <div class="d-flex flex-column col">
             <div class="d-flex align-items-center gap-2">
-                <h3>John Doe</h3>
-                <span class="badge rounded-pill text-bg-success">415 Reads</span>
+                <h3>{{ $user->name }}</h3>
+                {{-- <span class="ba    dge rounded-pill text-bg-success">415 Reads</span> --}}
             </div>
             <div class="d-flex">
-                <span><b class="me-1">Joined:</b>4 years ago</span>
+                <span><b class="me-1">Joined:</b>{{ $user->first_login_formatted }}</span>
             </div>
             <div class="d-flex">
-                <span><b class="me-1">Last read:</b>A hour ago</span>
+                <span><b class="me-1">Last read:</b>{{ $user->last_login_formatted }}</span>
             </div>
         </div>
     </div>

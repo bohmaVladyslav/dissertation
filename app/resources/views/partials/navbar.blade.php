@@ -31,7 +31,7 @@
             data-bs-toggle="dropdown"
             aria-expanded="false">
 
-                <img src="{{ asset('images/user.png') }}"
+                <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('images/user.png') }}"
                     class="rounded-circle"
                     width="40"
                     height="40"
@@ -42,8 +42,8 @@
 
             <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                    <a class="dropdown-item" href="{{ route('user.index') }}">
-                        Профиль
+                    <a class="dropdown-item" href="{{ route('user.edit') }}">
+                        Редактировать профиль
                     </a>
                 </li>
 

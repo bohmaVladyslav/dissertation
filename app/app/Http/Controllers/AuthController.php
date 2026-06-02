@@ -25,6 +25,11 @@ class AuthController extends Controller
 
         Auth::login($user);
 
+        $user->first_login_at = now();
+        $user->last_login_at = now();
+        $user->save();
+
+
         return redirect('user/');
     }
 
@@ -43,6 +48,16 @@ class AuthController extends Controller
         }
 
         $request->session()->regenerate();
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if (!$user->first_login_at) {
+            $user->first_login_at = now();
+        }
+
+        $user->last_login_at = now();
+        $user->save();
 
         return redirect()->route('user.index');
     }

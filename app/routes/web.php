@@ -44,7 +44,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/books/{book}/read', [BookController::class, 'read'])->name('books.read');
     Route::Resource('books', BookController::class);
     
-    Route::apiResource('user', UserController::class);
+    Route::get('/user', [UserController::class, 'index'])->name('user.index');
+    Route::get('/user/edit', [UserController::class, 'edit'])->name('user.edit');
+    Route::put('/user/edit', [UserController::class, 'update'])->name('user.update');
+    
     
     Route::delete('/collections/{collection}/all', [CollectionController::class, 'destroyAll'])->name('collections.destroyAll');
     Route::delete('/collection/{collection}/books/{book}', [CollectionController::class, 'deleteBook'])->name('collection.deleteBook');
