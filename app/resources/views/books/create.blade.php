@@ -51,6 +51,11 @@
                         id="description"
                         class="form-control @error('description')is-invalid @endif"
                         rows="4">{{ old('description') }}</textarea>
+                @error('description')
+                <div class="invalid-feedback">
+                    {{ $message }}
+                </div>
+                @enderror
             </div>
 
             <div class="mb-3">
@@ -108,7 +113,7 @@ document.querySelector('input[name="file"]').addEventListener('change', async fu
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch('/books/epub-meta', {
+    const response = await fetch('/books/meta', {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}'

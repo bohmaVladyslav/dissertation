@@ -29,7 +29,7 @@ Route::controller(AuthController::class)->group(function () {
 
 });
 
-Route::post('/books/epub-meta', [BookController::class, 'epubMeta']);
+Route::post('/books/meta', [BookController::class, 'meta']);
 Route::get('/books/{book}/read', [BookController::class, 'read'])->name('books.read');
 Route::post('/books/{book}/progress', [BookController::class, 'saveProgress']);
 

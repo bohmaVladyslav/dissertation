@@ -86,6 +86,15 @@
 
             <div id="viewer"></div>
 
+        {{-- FB2 --}}
+        @elseif($type === 'fb2')
+
+            <div class="fb2-reader" id="fb2Reader">
+
+                {!! $content !!}
+
+            </div>
+
         @else
 
             <div class="alert alert-danger">
@@ -148,6 +157,30 @@
 .epub-controls {
     display: flex;
     gap: 10px;
+}
+
+.fb2-reader {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 40px;
+    max-height: 85vh;
+    overflow-y: auto;
+    font-family: serif;
+    line-height: 1.8;
+    font-size: 18px;
+}
+
+.fb2-reader h1,
+.fb2-reader h2,
+.fb2-reader h3 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+}
+
+.fb2-reader p {
+    margin-bottom: 1rem;
+    text-align: justify;
 }
 
 </style>
@@ -215,6 +248,50 @@
         });
 
     });
+
+</script>
+
+@endif
+
+@if($type === 'fb2')
+
+<script>
+
+const reader = document.getElementById('fb2Reader');
+
+const savedProgress = {{ $book->progress?->progress ?? 0 }};
+
+console.log(savedProgress);
+
+reader.scrollTop =
+    (reader.scrollHeight - reader.clientHeight) * (savedProgress / 100);
+
+let timeout;
+
+reader.addEventListener('scroll', () => {
+
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+
+        const progress =
+            reader.scrollTop /
+            (reader.scrollHeight - reader.clientHeight) * 100;
+
+        fetch('/books/{{ $book->id }}/progress', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                progress: '' +progress
+            })
+        });
+
+    }, 500);
+
+});
 
 </script>
 

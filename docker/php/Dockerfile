@@ -18,6 +18,11 @@ RUN apt-get install -y libzip-dev zip \
 
 ENV NPM_CONFIG_CACHE=/tmp/npm-cache
 
+RUN apt-get update; \
+    apt-get install -y libmagickwand-dev; \
+    pecl install imagick; \
+    docker-php-ext-enable imagick;
+
 WORKDIR /var/www/app
 
 COPY docker/php/custom.php.ini /usr/local/etc/php/conf.d/custom.ini

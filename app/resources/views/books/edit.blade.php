@@ -104,7 +104,7 @@ document.querySelector('input[name="file"]').addEventListener('change', async fu
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch('/books/epub-meta', {
+    const response = await fetch('/books/meta', {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}'
