@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Collection;
 use Illuminate\Http\Request;
+use App\Models\Book;
+
+use Illuminate\Support\Facades\Log;
 
 class CollectionController extends Controller
 {
@@ -18,9 +21,11 @@ class CollectionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        return view('collections.create', [
+            'books' => Book::all()
+        ]);
     }
 
     /**
@@ -28,16 +33,27 @@ class CollectionController extends Controller
      */
     public function store(Request $request)
     {
+        Log::channel('info_file')->info('hvat?', $request->all());
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
+            'books' => 'required|array',
         ]);
 
+        Log::channel('info_file')->info('validated');
+
         $collection = Collection::create([
-            'name' => $validated['name'],
+            'name' => $validated['title'],
             'user_id' => $request->user()->id,
         ]);
 
-        return redirect('/user/collections/' . $collection->id);
+        Log::channel('info_file')->info('collection created');
+
+        $collection->books()->sync($request->books);
+
+        Log::channel('info_file')->info('books stored');
+
+        return redirect('/collections/' . $collection->id);
     }
 
     /**
@@ -45,13 +61,20 @@ class CollectionController extends Controller
      */
     public function show(Collection $collection)
     {
-        //
+        return view('collections.show', [
+            'collection' => $collection,
+        ]); 
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Collection $collection) {}
+    public function edit(Collection $collection) {
+        return view('collections.edit', [
+            'collection' => $collection,
+            'books' => Book::all()
+        ]); 
+    }
 
     /**
      * Update the specified resource in storage.
@@ -64,7 +87,7 @@ class CollectionController extends Controller
 
         Collection::update($validated);
 
-        return redirect('/user/collections/' . $collection->id);
+        return redirect('/collections/' . $collection->id);
     }
 
     /**
@@ -74,6 +97,6 @@ class CollectionController extends Controller
     {
         $collection->delete();
 
-        return redirect('/user/collections');
+        return redirect('/collections');
     }
 }

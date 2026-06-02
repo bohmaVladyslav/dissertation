@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Book;
 
-#[Fillable('name')]
+#[Fillable('name', 'user_id')]
 class Collection extends Model
 {
 

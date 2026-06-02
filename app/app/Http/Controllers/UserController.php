@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Book;
+use App\Models\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -12,7 +15,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        return view('user.index');
+        return view('user.index', [
+            'books' => Book::all(),
+            'collections' => Collection::all()
+        ]);
     }
 
     /**
@@ -44,7 +50,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        $user->currentAccessToken()->delete();
+        Auth::logout();
         $user->delete();
 
         return redirect('/');

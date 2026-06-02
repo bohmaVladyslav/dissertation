@@ -13,6 +13,11 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g npm
 
+RUN apt-get install -y libzip-dev zip \
+  && docker-php-ext-install zip
+
 ENV NPM_CONFIG_CACHE=/tmp/npm-cache
 
 WORKDIR /var/www/app
+
+COPY docker/php/custom.php.ini /usr/local/etc/php/conf.d/custom.ini

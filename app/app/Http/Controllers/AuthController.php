@@ -23,9 +23,9 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        $user->createToken('auth_token')->plainTextToken;
+        Auth::login($user);
 
-        return redirect('user.index');
+        return redirect('user/');
     }
 
     public function login(Request $request)
@@ -36,16 +36,15 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($credentials)) {
-            return response()->json([
-                'message' => 'Invalid credentials',
-            ], 401);
+            return back()->withErrors([
+                'email' => 'Invalid email or password.',
+                'password' => 'Invalid email or password.',
+            ])->onlyInput('email');
         }
 
-        $user = User::where('email', $credentials['email'])->first();
+        $request->session()->regenerate();
 
-        $user->createToken('auth_token')->plainTextToken;
-
-        return redirect('user.index');
+        return redirect()->route('user.index');
     }
 
     public function me(Request $request)
@@ -56,7 +55,10 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::logout();
+
+        // $request->session()->invalidate();
+        // $request->session()->regenerateToken();
 
         return redirect('/');
     }

@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\EpubService;
+use App\Models\ReadingProgress;
+use Illuminate\Support\Facades\Log;
+
 
 class BookController extends Controller
 {
@@ -21,38 +25,52 @@ class BookController extends Controller
      */
     public function create()
     {
-        //
+        return view('books.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, EpubService $epub)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
             'description' => 'string|max:1000',
-            'file' => 'required|file|mimes:pdf,epub,doc,docx|max:51200',
-            'cover' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'file' => 'required|file|extensions:pdf,epub,txt|max:102400',
+            'cover' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        $filePath = $request->file('file')->store('books/files/'. $request->user()->id, 'public');
-        $coverPath = $request->file('cover')->store('books/covers'. $request->user()->id, 'public');
+        $file = $request->file('file');
+        $filePath = $file->storeAs(
+            'books',
+            uniqid() . '.' . $file->getClientOriginalExtension(),
+            'public'
+        );
+        $fullPath = storage_path('app/public/' . $filePath);
+
+        $meta = $epub->extract($fullPath);
+
+        if ($meta['cover']) {
+            $coverPath = $meta['cover'];
+        } else if ($request->hasFile('cover')) {
+            $coverPath = $request->file('cover')->store('books/covers/'. $request->user()->id, 'public');
+        } else {
+            return back()->withErrors([
+                'cover' => 'Cover is required',
+            ]);
+        }
 
         $book = Book::create([
-            'title' => $validated['title'],
-            'author' => $validated['author'],
+            'title' => $meta['title'] ?? $validated['title'],
+            'author' => $meta['author'] ?? $validated['author'],
             'file_path' => $filePath,
             'cover_path' => $coverPath,
-            'description' => $validated['description'],
+            'description' => $meta['description'] ?? $validated['description'],
             'user_id' => $request->user()->id,
         ]);
 
-        return response()->json([
-            'message' => 'Book created successfully',
-            'book' => $book
-        ], 201);
+        return redirect('/books/' . $book->id);
     }
 
     /**
@@ -60,7 +78,7 @@ class BookController extends Controller
      */
     public function show(Book $book)
     {
-        //
+        return view('books.show', compact('book'));
     }
 
     /**
@@ -68,19 +86,19 @@ class BookController extends Controller
      */
     public function edit(Book $book)
     {
-        
+        return view('books.edit', compact('book'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Book $book)
+    public function update(Request $request, Book $book, EpubService $epub)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'author' => 'required|string|max:255',
-
-            'file' => 'nullable|file|mimes:pdf,epub,doc,docx|max:51200',
+            'description' => 'string|max:1000',
+            'file' => 'nullable|file|extensions:pdf,epub,txt|max:5120000',
             'cover' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
@@ -89,7 +107,7 @@ class BookController extends Controller
                 Storage::disk('public')->delete($book->file_path);
             }
 
-            $book->file_path = $request->file('file')->store('books/files'. $request->user()->id, 'public');
+            $book->file_path = $request->file('file')->store('books/files/'. $request->user()->id, 'public');
         }
 
         if ($request->hasFile('cover')) {
@@ -97,18 +115,26 @@ class BookController extends Controller
                 Storage::disk('public')->delete($book->cover_path);
             }
 
-            $book->cover_path = $request->file('cover')->store('books/covers'. $request->user()->id, 'public');
+            $book->cover_path = $request->file('cover')->store('books/covers/'. $request->user()->id, 'public');
+        } else if ($request->hasFile('file')) {
+            $meta = $epub->extract(storage_path('app/public/' . $book->file_path));
+
+            if ($meta['cover']) {
+                $book->cover_path = $meta['cover'];
+            } else {
+                return back()->withErrors([
+                    'cover' => 'Cover is required',
+                ]);
+            }
         }
 
         $book->title = $validated['title'];
+        $book->description = $validated['description'];
         $book->author = $validated['author'];
 
         $book->save();
 
-        return response()->json([
-            'message' => 'Book updated successfully',
-            'book' => $book
-        ]);
+        return redirect('/books/' . $book->id);
     }
 
     /**
@@ -128,6 +154,97 @@ class BookController extends Controller
 
         return response()->json([
             'message' => 'Book deleted successfully'
+        ]);
+    }
+
+    public function read(Request $request, Book $book)
+    {
+        $userId = $request->user()->id;
+
+        $book->load(['progress' => function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+        }]);
+
+        $extension = strtolower(pathinfo($book->file_path, PATHINFO_EXTENSION));
+
+        Log::info($extension);
+        Log::info($book->file_path);
+
+        $data = [
+            'book' => $book,
+            'type' => $extension,
+        ];
+
+        switch ($extension) {
+
+            case 'txt':
+
+                $content = Storage::disk('public')->get($book->file_path);
+
+                $data['content'] = $content;
+
+                break;
+
+            case 'pdf':
+
+                $data['fileUrl'] = asset('storage/' . $book->file_path);
+
+                break;
+
+            case 'epub':
+
+                $data['fileUrl'] = asset('storage/' . $book->file_path);
+
+                break;
+
+            default:
+
+                abort(415, 'Unsupported file format');
+        }
+
+        return view('books.read', $data);
+    }
+
+
+    public function epubMeta(Request $request, EpubService $epub)
+    {
+        $request->validate([
+            'file' => 'required|file',
+        ]);
+
+        $path = $request->file('file')->store('tmp', 'local');
+        $fullPath = storage_path("app/private/{$path}");
+
+        $meta = $epub->extract($fullPath);
+
+        return response()->json([
+            'title' => $meta['title'],
+            'author' => $meta['author'],
+            'description' => $meta['description'],
+            'cover_url' => $meta['cover']
+                ? asset('storage/' . $meta['cover'])
+                : null,
+        ]);
+    }
+
+    public function saveProgress(Request $request, Book $book)
+    {
+        $request->validate([
+            'progress' => 'required|string'
+        ]);
+
+        ReadingProgress::updateOrCreate(
+            [
+                'user_id' => $request->user()->id,
+                'book_id' => $book->id,
+            ],
+            [
+                'progress' => $request->progress,
+            ]
+        );
+
+        return response()->json([
+            'success' => true
         ]);
     }
 }

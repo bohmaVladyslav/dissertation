@@ -10,3 +10,8 @@
 }
 
 @import "bootstrap/dist/css/bootstrap.min.css";
+
+
+.logo {
+    max-width: 55px;
+}
