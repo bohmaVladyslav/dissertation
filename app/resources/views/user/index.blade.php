@@ -21,7 +21,7 @@
     {{-- Мои книги --}}
     <div class="row mb-5">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0">Мои книги</h4>
+            <h4 class="mb-0">My books</h4>
             {{-- <a href="#" class="text-decoration-none">Смотреть все</a> --}}
         </div>
 

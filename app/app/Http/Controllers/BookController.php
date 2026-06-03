@@ -25,9 +25,11 @@ class BookController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('books.create');
+        return view('books.create', [
+            'user' => $request->user(),
+        ]);
     }
 
     /**
@@ -117,15 +119,21 @@ class BookController extends Controller
             abort(403);
         }
 
-        return view('books.show', compact('book'));
+        return view('books.show', [
+            'book' => $book,
+            'user' => $request->user(),
+        ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Book $book)
+    public function edit(Request $request, Book $book)
     {
-        return view('books.edit', compact('book'));
+        return view('books.edit', [
+            'book' => $book,
+            'user' => $request->user(),
+        ]);
     }
 
     /**
@@ -216,6 +224,7 @@ class BookController extends Controller
         $data = [
             'book' => $book,
             'type' => $extension,
+            'user' => $request->user(),
         ];
 
         switch ($extension) {
@@ -298,6 +307,31 @@ class BookController extends Controller
 
         return response()->json([
             'success' => true
+        ]);
+    }
+
+    public function search(Request $request)
+    {
+        $search = $request->q;
+
+        $books = Book::query()
+            ->when($search, function ($query) use ($search) {
+
+                $terms = explode(' ', $search);
+
+                $query->where(function ($q) use ($terms) {
+                    foreach ($terms as $term) {
+                        $q->orWhere('title', 'LIKE', "%{$term}%")
+                        ->orWhere('author', 'LIKE', "%{$term}%");
+                    }
+                });
+
+            })
+            ->get();
+
+        return view('books.search', [
+            'books' => $books,
+            'user' => $request->user(),
         ]);
     }
 }

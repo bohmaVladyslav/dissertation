@@ -42,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/books/meta', [BookController::class, 'meta']);
     Route::post('/books/{book}/progress', [BookController::class, 'saveProgress']);
     Route::get('/books/{book}/read', [BookController::class, 'read'])->name('books.read');
+    Route::get('/books/search', [BookController::class, 'search'])->name('books.search');
     Route::Resource('books', BookController::class);
     
     Route::get('/user', [UserController::class, 'index'])->name('user.index');

@@ -9,19 +9,19 @@
 
         <div>
             <a href="{{ route('collections.edit', $collection->id) }}" class="btn btn-warning">
-                Редактировать
+                Edit
             </a>
 
             <a href="{{ route('collections.download', $collection->id) }}" download class="btn btn-primary">
-                Скачать
+                Download
             </a>
 
             <form action="{{ route('collections.destroy', $collection->id) }}" method="POST" class="d-inline">
                 @csrf
                 @method('DELETE')
 
-                <button class="btn btn-danger" onclick="return confirm('Удалить коллекцию?')">
-                    Удалить
+                <button class="btn btn-danger" onclick="return confirm('Delete the collection?')">
+                    Delete
                 </button>
             </form>
 
@@ -29,8 +29,8 @@
                 @csrf
                 @method('DELETE')
 
-                <button class="btn btn-danger" onclick="return confirm('Удалить коллекцию с книгами?')">
-                    Удалить вместе с книгами
+                <button class="btn btn-danger" onclick="return confirm('Delete the collection containing the books?')">
+                    Delete with the books
                 </button>
             </form>
         </div>
@@ -55,7 +55,7 @@
 
                             <div class="d-flex gap-2">
                                 <a href="{{ route('books.show', $book->id) }}" class="btn btn-sm btn-outline-primary">
-                                    Открыть
+                                    Open
                                 </a>
     
                                 <form action="{{ route('collection.deleteBook', [$collection->id, $book->id]) }}" method="POST" class="d-inline">
@@ -63,7 +63,7 @@
                                     @method('DELETE')
     
                                     <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Удалить коллекцию?')">
-                                        Удалить из коллекции
+                                        Delete from collection
                                     </button>
                                 </form>
                                 
@@ -71,8 +71,8 @@
                                     @csrf
                                     @method('DELETE')
     
-                                    <button class="btn btn-sm btn-danger" onclick="return confirm('Удалить книгу?')">
-                                        Удалить книгу
+                                    <button class="btn btn-sm btn-danger" onclick="return confirm('Delete the book?')">
+                                        Delete the book
                                     </button>
                                 </form>
                             </div>

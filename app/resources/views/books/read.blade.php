@@ -56,15 +56,15 @@
             <div class="epub-controls mb-3">
 
                 <button id="prevPage" class="btn btn-outline-primary">
-                    ← Назад
+                    ← Back
                 </button>
 
                 <button id="nextPage" class="btn btn-outline-primary">
-                    Вперед →
+                    Forward →
                 </button>
 
                 <button id="firstPage" class="btn btn-outline-secondary">
-                    В начало
+                    At the beginning
                 </button>
 
                 <div class="ms-3 d-flex gap-2 align-items-center">
@@ -77,7 +77,7 @@
                         placeholder="page">
 
                     <button id="goToPageBtn" class="btn btn-primary">
-                        Перейти
+                        Go to
                     </button>
 
                 </div>

@@ -24,7 +24,8 @@ class CollectionController extends Controller
     public function create(Request $request)
     {
         return view('collections.create', [
-            'books' => Book::all()
+            'books' => Book::all(),
+            'user' => $request->user(),
         ]);
     }
 
@@ -59,20 +60,23 @@ class CollectionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Collection $collection)
+    public function show(Request $request, Collection $collection)
     {
         return view('collections.show', [
             'collection' => $collection,
+            'user' => $request->user(),
+            'books' => $collection->books
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Collection $collection)
+    public function edit(Request $request, Collection $collection)
     {
         return view('collections.edit', [
             'collection' => $collection,
+            'user' => $request->user(),
             'books' => Book::all()
         ]);
     }
@@ -122,14 +126,12 @@ class CollectionController extends Controller
             return back()->withErrors(['collection' => 'Коллекция пуста']);
         }
 
-        // 1. временная папка
         $tempDir = storage_path('app/tmp/' . Str::uuid());
 
         if (!is_dir($tempDir)) {
             mkdir($tempDir, 0777, true);
         }
 
-        // 2. копируем файлы книг во временную папку
         foreach ($books as $book) {
             $sourcePath = storage_path('app/public/' . $book->file_path);
 
@@ -139,7 +141,6 @@ class CollectionController extends Controller
 
             $extension = pathinfo($book->file_path, PATHINFO_EXTENSION);
 
-            // чистим название файла
             $safeTitle = preg_replace('/[^\p{L}\p{N}\s\-]/u', '', $book->title);
             $safeTitle = trim($safeTitle);
             $safeTitle = str_replace(' ', '_', $safeTitle);
@@ -153,14 +154,13 @@ class CollectionController extends Controller
             copy($sourcePath, $tempDir . '/' . $fileName);
         }
 
-        // 3. создаём zip архив
         $zipName = $collection->name . '.zip';
         $zipPath = storage_path('app/tmp/' . $zipName);
 
         $zip = new \ZipArchive();
 
         if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
-            return back()->withErrors(['collection' => 'Не удалось создать архив']);
+            return back()->withErrors(['collection' => 'Unable to create the archive']);
         }
 
         $files = scandir($tempDir);
@@ -173,13 +173,11 @@ class CollectionController extends Controller
 
         $zip->close();
 
-        // 4. удаляем временную папку
         foreach (glob($tempDir . '/*') as $file) {
             unlink($file);
         }
         rmdir($tempDir);
 
-        // 5. отдаём файл пользователю
         return response()->download($zipPath)->deleteFileAfterSend(true);
     }
 

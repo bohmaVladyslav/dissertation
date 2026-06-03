@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="container">
-    <h1 class="mb-4">Редактирование коллекции</h1>
+    <h1 class="mb-4">Editing a collection</h1>
 
     <form action="{{ route('collections.store') }}" method="POST">
         @csrf
 
         {{-- Название коллекции --}}
         <div class="mb-3">
-            <label for="title" class="form-label">Название коллекции</label>
+            <label for="title" class="form-label">Collection name</label>
             <input
                 type="text"
                 name="title"
@@ -25,7 +25,7 @@
 
         {{-- Выбор книг --}}
         <div class="mb-3">
-            <label class="form-label">Книги</label>
+            <label class="form-label">Books</label>
 
             <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
                 @foreach ($books as $book)
@@ -51,7 +51,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary">
-            Подтвердить
+            Submit
         </button>
     </form>
 </div>

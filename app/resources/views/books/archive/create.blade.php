@@ -7,7 +7,7 @@
 
             <div class="card">
                 <div class="card-header">
-                    Загрузка архива книг
+                    Upload the book archive
                 </div>
 
                 <div class="card-body">
@@ -26,7 +26,7 @@
                         @csrf
 
                         <div class="mb-3">
-                            <label for="archive" class="form-label">Архив книг (ZIP / RAR)</label>
+                            <label for="archive" class="form-label">Book archive (ZIP / RAR)</label>
                             <input 
                                 type="file" 
                                 class="form-control"
@@ -36,18 +36,18 @@
                                 required
                             >
                             <div class="form-text">
-                                Поддерживаются архивы: ZIP, RAR, 7Z. Внутри должны быть книги (epub, fb2, pdf, txt).
+                                Supported archive formats: ZIP, RAR, 7Z. The archives must contain books (epub, fb2, pdf, txt).
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="collection_name" class="form-label">Название коллекции (необязательно)</label>
+                            <label for="collection_name" class="form-label">Collection title (optional)</label>
                             <input 
                                 type="text"
                                 class="form-control"
                                 id="collection_name"
                                 name="collection_name"
-                                placeholder="Например: Фантастика 2026"
+                                placeholder="Fantasy 2026"
                             >
                         </div>
 
@@ -63,7 +63,7 @@
                         </div> --}}
 
                         <button type="submit" class="btn btn-primary">
-                            Загрузить и обработать архив
+                            Download and process the archive
                         </button>
 
                         @error('archive')
@@ -79,13 +79,13 @@
                 </div>
             </div>
 
-            <div class="mt-3 text-muted small">
-                После загрузки система автоматически:
+            <div class="mt-3 text-muted small col-md-8">
+                Once the download is complete, the system will automatically:
                 <ul>
-                    <li>распакует архив</li>
-                    <li>создаст коллекцию (если не указана — создаст автоматически)</li>
-                    <li>добавит книги в базу</li>
-                    <li>попытается извлечь метаданные</li>
+                    <li>unpack the archive</li>
+                    <li>create a collection (if none is specified, it will be created automatically)</li>
+                    <li>add the books to the database</li>
+                    <li>attempt to extract metadata</li>
                 </ul>
             </div>
 

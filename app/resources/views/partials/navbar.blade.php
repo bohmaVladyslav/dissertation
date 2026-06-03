@@ -15,10 +15,12 @@
             </a>
 
             {{-- Поиск --}}
-            <form class="flex-grow-1" role="search">
+            <form class="flex-grow-1" role="search" action="{{ route('books.search') }}" method="GET">
                 <input class="form-control"
                     type="search"
-                    placeholder="Поиск книг...">
+                    name="q"
+                    aria-label="Search"
+                    placeholder="Search for books...">
             </form>
 
         </div>
@@ -43,25 +45,25 @@
             <ul class="dropdown-menu dropdown-menu-end">
                 <li>
                     <a class="dropdown-item" href="{{ route('user.edit') }}">
-                        Редактировать профиль
+                        Edit profile
                     </a>
                 </li>
 
                 <li>
                     <a class="dropdown-item" href="{{ route('books.create') }}">
-                        Добавить книгу
+                        Add a book
                     </a>
                 </li>
 
                 <li>
                     <a class="dropdown-item" href="{{ route('collections.create') }}">
-                        Добавить коллекцию
+                        Add a collection
                     </a>
                 </li>
 
                 <li>
                     <a class="dropdown-item" href="{{ route('books.archive.create') }}">
-                        Загрузить архив
+                        Download the archive
                     </a>
                 </li>
 
@@ -71,7 +73,7 @@
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button class="dropdown-item text-danger" type="submit">
-                            Выйти
+                            Log out
                         </button>
                     </form>
                 </li>

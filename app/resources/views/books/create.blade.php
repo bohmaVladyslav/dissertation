@@ -5,14 +5,14 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
 
-        <h3 class="mb-4">Добавить книгу</h3>
+        <h3 class="mb-4">Add new book</h3>
 
         <form action="{{ route('books.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             {{-- Название --}}
             <div class="mb-3">
-                <label class="form-label">Название</label>
+                <label class="form-label">Title</label>
                 <input type="text"
                        name="title"
                        id="title"
@@ -29,7 +29,7 @@
 
             {{-- Автор --}}
             <div class="mb-3">
-                <label class="form-label">Автор</label>
+                <label class="form-label">Author</label>
                 <input type="text"
                        name="author"
                        class="form-control @error('author')is-invalid @endif"
@@ -46,7 +46,7 @@
 
             {{-- Описание --}}
             <div class="mb-3">
-                <label class="form-label">Описание</label>
+                <label class="form-label">Description</label>
                 <textarea name="description"
                         id="description"
                         class="form-control @error('description')is-invalid @endif"
@@ -59,10 +59,10 @@
             </div>
 
             <div class="mb-3">
-                <label id="coverLabel">Обложка</label>
+                <label id="coverLabel">Cover</label>
 
                 <button type="button" id="coverBtn" onclick="document.getElementById('coverInput').click()">
-                    Заменить обложку
+                    Change cover
                 </button>
 
                 <input type="file" name="cover" id="coverInput" class="form-control @error('cover')is-invalid @endif">
@@ -78,7 +78,7 @@
 
             {{-- Файл книги --}}
             <div class="mb-3">
-                <label class="form-label">Файл книги</label>
+                <label class="form-label">File</label>
 
                 <input type="file"
                     name="file"
@@ -93,7 +93,7 @@
 
             {{-- Кнопка --}}
             <button type="submit" class="btn btn-primary w-100">
-                Добавить книгу
+                Add the book
             </button>
 
         </form>

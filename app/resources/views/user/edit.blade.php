@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Редактирование профиля</h1>
+    <h1>Edit profile</h1>
 
     {{-- Ошибки --}}
     @if ($errors->any())
@@ -21,7 +21,7 @@
 
         {{-- АВАТАР --}}
         <div class="mb-3">
-            <label class="form-label">Аватар</label>
+            <label class="form-label">Image</label>
 
             <div class="mb-2">
                 <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('images/user.png') }}"
@@ -36,7 +36,7 @@
 
         {{-- ИМЯ --}}
         <div class="mb-3">
-            <label class="form-label">Имя</label>
+            <label class="form-label">Name</label>
             <input type="text"
                    name="name"
                    value="{{ old('name', $user->name) }}"
