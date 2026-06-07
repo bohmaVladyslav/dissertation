@@ -53,15 +53,10 @@ class BooksArchiveController extends Controller
             mkdir($extractPath, 0777, true);
         }
 
-        $zip = new \ZipArchive();
-
-        $res = $zip->open($fullArchivePath);
-
-        if ($res === true) {
-            $zip->extractTo($extractPath);
-            $zip->close();
-        } else {
-            return back()->withErrors(['archive' => 'Unable to extract the archive']);
+        try {
+            $processor->extractArchive($fullArchivePath, $extractPath);
+        } catch (\Throwable $th) {
+            return back()->withErrors(['archive' => 'Unable to extract the archive: ' . $th->getMessage()]);
         }
 
         $collection = Collection::create([

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class BookArchiveProcessor
@@ -90,5 +91,26 @@ class BookArchiveProcessor
             ->replace(['_', '.'], ' ')
             ->title()
             ->toString();
+    }
+
+    public function extractArchive(string $archivePath, string $extractPath): void
+    {
+        $command = sprintf(
+            '7z x %s -o%s -y',
+            escapeshellarg($archivePath),
+            escapeshellarg($extractPath)
+        );
+
+        exec($command, $output, $code);
+
+        if ($code !== 0) {
+            Log::info($command);
+            Log::info('Processing PDF', [
+                'file' => $archivePath,
+                'size_mb' => round(filesize($archivePath) / 1024 / 1024, 2),
+            ]);
+            Log::error($code);
+            throw new \RuntimeException('Archive extraction failed');
+        }
     }
 }

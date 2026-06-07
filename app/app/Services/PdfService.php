@@ -40,20 +40,19 @@ class PdfService
         try {
             $imagick = new \Imagick();
 
-            // Чем выше DPI, тем качественнее превью
-            $imagick->setResolution(150, 150);
-
-            // Загружаем только первую страницу
+            $imagick->setResolution(100, 100);
             $imagick->readImage($filePath . '[0]');
-
             $imagick->setImageFormat('jpeg');
 
-            $cover = $imagick->getImageBlob();
+            $filename = 'covers/' . uniqid() . '.jpg';
+            $fullPath = storage_path('app/public/' . $filename);
+
+            $imagick->writeImage($fullPath);
 
             $imagick->clear();
             $imagick->destroy();
 
-            return $cover;
+            return $filename;
         } catch (\Throwable $e) {
             return null;
         }

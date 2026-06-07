@@ -22,6 +22,7 @@ class UserController extends Controller
         return view('user.index', [
             'books' => Book::all(),
             'collections' => Collection::all(),
+            'booksChunks' => Book::all()->chunk(4),
             'user' => $user,
         ]);
     }

@@ -63,7 +63,7 @@
 
                 <li>
                     <a class="dropdown-item" href="{{ route('books.archive.create') }}">
-                        Download the archive
+                        Upload the archive
                     </a>
                 </li>
 

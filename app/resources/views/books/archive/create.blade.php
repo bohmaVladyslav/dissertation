@@ -63,7 +63,7 @@
                         </div> --}}
 
                         <button type="submit" class="btn btn-primary">
-                            Download and process the archive
+                            Upload and process the archive
                         </button>
 
                         @error('archive')
@@ -80,7 +80,7 @@
             </div>
 
             <div class="mt-3 text-muted small col-md-8">
-                Once the download is complete, the system will automatically:
+                Once the upload is complete, the system will automatically:
                 <ul>
                     <li>unpack the archive</li>
                     <li>create a collection (if none is specified, it will be created automatically)</li>
